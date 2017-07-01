@@ -108,13 +108,13 @@ JSNES.Encoder.prototype = {
             ];
 
             for (var i = 0; i < 64; i++) {
-                var t = ffloor((YQT[i]*sf+50)/100);
+                var t = this.ffloor((this.YQT[i]*sf+50)/100);
                 if (t < 1) {
                     t = 1;
                 } else if (t > 255) {
                     t = 255;
                 }
-                YTable[ZigZag[i]] = t;
+                this.YTable[this.ZigZag[i]] = t;
             }
             this.UVQT = [
                 17, 18, 24, 47, 99, 99, 99, 99,
@@ -127,13 +127,13 @@ JSNES.Encoder.prototype = {
                 99, 99, 99, 99, 99, 99, 99, 99
             ];
             for (var j = 0; j < 64; j++) {
-                var u = ffloor((UVQT[j]*sf+50)/100);
+                var u = this.ffloor((this.UVQT[j]*sf+50)/100);
                 if (u < 1) {
                     u = 1;
                 } else if (u > 255) {
                     u = 255;
                 }
-                UVTable[ZigZag[j]] = u;
+                this.UVTable[this.ZigZag[j]] = u;
             }
             var aasf = [
                 1.0, 1.387039845, 1.306562965, 1.175875602,
@@ -144,8 +144,8 @@ JSNES.Encoder.prototype = {
             {
                 for (var col = 0; col < 8; col++)
                 {
-                    fdtbl_Y[k]  = (1.0 / (YTable [ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
-                    fdtbl_UV[k] = (1.0 / (UVTable[ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+                    this.fdtbl_Y[k]  = (1.0 / (this.YTable [this.ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+                    this.fdtbl_UV[k] = (1.0 / (this.UVTable[this.ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
                     k++;
                 }
             }
@@ -170,10 +170,11 @@ JSNES.Encoder.prototype = {
 
       initHuffmanTbl: function()
         {
-            YDC_HT = this.computeHuffmanTbl(this.std_dc_luminance_nrcodes,this.std_dc_luminance_values);
-            UVDC_HT = this.computeHuffmanTbl(this.std_dc_chrominance_nrcodes,this.std_dc_chrominance_values);
-            YAC_HT = this.computeHuffmanTbl(this.std_ac_luminance_nrcodes,this.std_ac_luminance_values);
-            UVAC_HT = this.computeHuffmanTbl(this.std_ac_chrominance_nrcodes,this.std_ac_chrominance_values);
+            console.log("initing huffman tbl");
+            this.YDC_HT = this.computeHuffmanTbl(this.std_dc_luminance_nrcodes,this.std_dc_luminance_values);
+            this.UVDC_HT = this.computeHuffmanTbl(this.std_dc_chrominance_nrcodes,this.std_dc_chrominance_values);
+            this.YAC_HT = this.computeHuffmanTbl(this.std_ac_luminance_nrcodes,this.std_ac_luminance_values);
+            this.UVAC_HT = this.computeHuffmanTbl(this.std_ac_chrominance_nrcodes,this.std_ac_chrominance_values);
         },
 
         initCategoryNumber: function()
@@ -226,11 +227,11 @@ JSNES.Encoder.prototype = {
                 bytepos--;
                 if (bytepos < 0) {
                     if (bytenew == 0xFF) {
-                        writeByte(0xFF);
-                        writeByte(0);
+                        this.writeByte(0xFF);
+                        this.writeByte(0);
                     }
                     else {
-                        writeByte(bytenew);
+                        this.writeByte(bytenew);
                     }
                     bytepos=7;
                     bytenew=0;
@@ -245,8 +246,8 @@ JSNES.Encoder.prototype = {
 
         writeWord: function(value)
         {
-            writeByte((value>>8)&0xFF);
-            writeByte((value   )&0xFF);
+            this.writeByte((value>>8)&0xFF);
+            this.writeByte((value)&0xFF);
         },
 
         // DCT & quantization core
@@ -375,61 +376,61 @@ JSNES.Encoder.prototype = {
             {
                 // Apply the quantization and scaling factor & Round to nearest integer
                 fDCTQuant = data[i]*fdtbl[i];
-                outputfDCTQuant[i] = (fDCTQuant > 0.0) ? ((fDCTQuant + 0.5)|0) : ((fDCTQuant - 0.5)|0);
+                this.outputfDCTQuant[i] = (fDCTQuant > 0.0) ? ((fDCTQuant + 0.5)|0) : ((fDCTQuant - 0.5)|0);
                 //outputfDCTQuant[i] = fround(fDCTQuant);
 
             }
-            return outputfDCTQuant;
+            return this.outputfDCTQuant;
         },
 
         writeAPP0: function()
         {
-            writeWord(0xFFE0); // marker
-            writeWord(16); // length
-            writeByte(0x4A); // J
-            writeByte(0x46); // F
-            writeByte(0x49); // I
-            writeByte(0x46); // F
-            writeByte(0); // = "JFIF",'\0'
-            writeByte(1); // versionhi
-            writeByte(1); // versionlo
-            writeByte(0); // xyunits
-            writeWord(1); // xdensity
-            writeWord(1); // ydensity
-            writeByte(0); // thumbnwidth
-            writeByte(0); // thumbnheight
+            this.writeWord(0xFFE0); // marker
+            this.writeWord(16); // length
+            this.writeByte(0x4A); // J
+            this.writeByte(0x46); // F
+            this.writeByte(0x49); // I
+            this.writeByte(0x46); // F
+            this.writeByte(0); // = "JFIF",'\0'
+            this.writeByte(1); // versionhi
+            this.writeByte(1); // versionlo
+            this.writeByte(0); // xyunits
+            this.writeWord(1); // xdensity
+            this.writeWord(1); // ydensity
+            this.writeByte(0); // thumbnwidth
+            this.writeByte(0); // thumbnheight
         },
 
         writeSOF0: function(width, height)
         {
-            writeWord(0xFFC0); // marker
-            writeWord(17);   // length, truecolor YUV JPG
-            writeByte(8);    // precision
-            writeWord(height);
-            writeWord(width);
-            writeByte(3);    // nrofcomponents
-            writeByte(1);    // IdY
-            writeByte(0x11); // HVY
-            writeByte(0);    // QTY
-            writeByte(2);    // IdU
-            writeByte(0x11); // HVU
-            writeByte(1);    // QTU
-            writeByte(3);    // IdV
-            writeByte(0x11); // HVV
-            writeByte(1);    // QTV
+            this.writeWord(0xFFC0); // marker
+            this.writeWord(17);   // length, truecolor YUV JPG
+            this.writeByte(8);    // precision
+            this.writeWord(height);
+            this.writeWord(width);
+            this.writeByte(3);    // nrofcomponents
+            this.writeByte(1);    // IdY
+            this.writeByte(0x11); // HVY
+            this.writeByte(0);    // QTY
+            this.writeByte(2);    // IdU
+            this.writeByte(0x11); // HVU
+            this.writeByte(1);    // QTU
+            this.writeByte(3);    // IdV
+            this.writeByte(0x11); // HVV
+            this.writeByte(1);    // QTV
         },
 
         writeDQT: function()
         {
-            writeWord(0xFFDB); // marker
-            writeWord(132);       // length
-            writeByte(0);
+            this.writeWord(0xFFDB); // marker
+            this.writeWord(132);       // length
+            this.writeByte(0);
             for (var i=0; i<64; i++) {
-                writeByte(YTable[i]);
+                this.writeByte(this.YTable[i]);
             }
-            writeByte(1);
+            this.writeByte(1);
             for (var j=0; j<64; j++) {
-                writeByte(UVTable[j]);
+                this.writeByte(this.UVTable[j]);
             }
         },
 
@@ -440,34 +441,34 @@ JSNES.Encoder.prototype = {
 
             this.writeByte(0); // HTYDCinfo
             for (var i=0; i<16; i++) {
-                this.writeByte(self.std_dc_luminance_nrcodes[i+1]);
+                this.writeByte(this.std_dc_luminance_nrcodes[i+1]);
             }
             for (var j=0; j<=11; j++) {
-                this.writeByte(self.std_dc_luminance_values[j]);
+                this.writeByte(this.std_dc_luminance_values[j]);
             }
 
             this.writeByte(0x10); // HTYACinfo
             for (var k=0; k<16; k++) {
-                this.writeByte(self.std_ac_luminance_nrcodes[k+1]);
+                this.writeByte(this.std_ac_luminance_nrcodes[k+1]);
             }
             for (var l=0; l<=161; l++) {
-                this.writeByte(self.std_ac_luminance_values[l]);
+                this.writeByte(this.std_ac_luminance_values[l]);
             }
 
             this.writeByte(1); // HTUDCinfo
             for (var m=0; m<16; m++) {
-                this.writeByte(self.std_dc_chrominance_nrcodes[m+1]);
+                this.writeByte(this.std_dc_chrominance_nrcodes[m+1]);
             }
             for (var n=0; n<=11; n++) {
-                this.writeByte(self.std_dc_chrominance_values[n]);
+                this.writeByte(this.std_dc_chrominance_values[n]);
             }
 
             this.writeByte(0x11); // HTUACinfo
             for (var o=0; o<16; o++) {
-                this.writeByte(self.std_ac_chrominance_nrcodes[o+1]);
+                this.writeByte(this.std_ac_chrominance_nrcodes[o+1]);
             }
             for (var p=0; p<=161; p++) {
-                this.writeByte(self.std_ac_chrominance_values[p]);
+                this.writeByte(this.std_ac_chrominance_values[p]);
             }
         },
 
@@ -494,47 +495,49 @@ JSNES.Encoder.prototype = {
             const I16 = 16;
             const I63 = 63;
             const I64 = 64;
-            var DU_DCT = fDCTQuant(CDU, fdtbl);
+            var DU_DCT = this.fDCTQuant(CDU, fdtbl);
             //ZigZag reorder
             for (var j=0;j<I64;++j) {
-                DU[ZigZag[j]]=DU_DCT[j];
+                this.DU[this.ZigZag[j]]=DU_DCT[j];
             }
-            var Diff = DU[0] - DC; DC = DU[0];
+            var Diff = this.DU[0] - DC; DC = this.DU[0];
             //Encode DC
+
+
             if (Diff==0) {
-                writeBits(HTDC[0]); // Diff might be 0
+                this.writeBits(HTDC[0]); // Diff might be 0
             } else {
                 pos = 32767+Diff;
-                writeBits(HTDC[category[pos]]);
-                writeBits(bitcode[pos]);
+                this.writeBits(HTDC[this.category[pos]]);
+                this.writeBits(this.bitcode[pos]);
             }
             //Encode ACs
             var end0pos = 63; // was const... which is crazy
-            for (; (end0pos>0)&&(DU[end0pos]==0); end0pos--) {};
+            for (; (end0pos>0)&&(this.DU[end0pos]==0); end0pos--) {};
             //end0pos = first element in reverse order !=0
             if ( end0pos == 0) {
-                writeBits(EOB);
+                this.writeBits(EOB);
                 return DC;
             }
             var i = 1;
             var lng;
             while ( i <= end0pos ) {
                 var startpos = i;
-                for (; (DU[i]==0) && (i<=end0pos); ++i) {}
+                for (; (this.DU[i]==0) && (i<=end0pos); ++i) {}
                 var nrzeroes = i-startpos;
                 if ( nrzeroes >= I16 ) {
                     lng = nrzeroes>>4;
                     for (var nrmarker=1; nrmarker <= lng; ++nrmarker)
-                        writeBits(M16zeroes);
+                        this.writeBits(M16zeroes);
                     nrzeroes = nrzeroes&0xF;
                 }
-                pos = 32767+DU[i];
-                writeBits(HTAC[(nrzeroes<<4)+category[pos]]);
-                writeBits(bitcode[pos]);
+                pos = 32767+ this.DU[i];
+                this.writeBits(HTAC[(nrzeroes<<4)+this.category[pos]]);
+                this.writeBits(this.bitcode[pos]);
                 i++;
             }
             if ( end0pos != I63 ) {
-                writeBits(EOB);
+                this.writeBits(EOB);
             }
             return DC;
         },
@@ -550,7 +553,7 @@ JSNES.Encoder.prototype = {
         {
             var time_start = new Date().getTime();
 
-            if(quality) setQuality(quality);
+            if(quality) this.setQuality(quality);
 
             // Initialize bit writer
             byteout = new Array();
@@ -558,12 +561,12 @@ JSNES.Encoder.prototype = {
             bytepos=7;
 
             // Add JPEG headers
-            writeWord(0xFFD8); // SOI
-            writeAPP0();
-            writeDQT();
-            writeSOF0(image.width,image.height);
-            writeDHT();
-            writeSOS();
+            this.writeWord(0xFFD8); // SOI
+            this.writeAPP0();
+            this.writeDQT();
+            this.writeSOF0(image.width,image.height);
+            this.writeDHT();
+            this.writeSOS();
 
             // Encode 8x8 macroblocks
             var DCY=0;
@@ -617,15 +620,15 @@ JSNES.Encoder.prototype = {
                     */
 
                     // use lookup table (slightly faster)
-                    YDU[pos] = ((RGB_YUV_TABLE[r]             + RGB_YUV_TABLE[(g +  256)>>0] + RGB_YUV_TABLE[(b +  512)>>0]) >> 16)-128;
-                    UDU[pos] = ((RGB_YUV_TABLE[(r +  768)>>0] + RGB_YUV_TABLE[(g + 1024)>>0] + RGB_YUV_TABLE[(b + 1280)>>0]) >> 16)-128;
-                    VDU[pos] = ((RGB_YUV_TABLE[(r + 1280)>>0] + RGB_YUV_TABLE[(g + 1536)>>0] + RGB_YUV_TABLE[(b + 1792)>>0]) >> 16)-128;
+                    this.YDU[pos] = ((this.RGB_YUV_TABLE[r]             + this.RGB_YUV_TABLE[(g +  256)>>0] + this.RGB_YUV_TABLE[(b +  512)>>0]) >> 16)-128;
+                    this.UDU[pos] = ((this.RGB_YUV_TABLE[(r +  768)>>0] + this.RGB_YUV_TABLE[(g + 1024)>>0] + this.RGB_YUV_TABLE[(b + 1280)>>0]) >> 16)-128;
+                    this.VDU[pos] = ((this.RGB_YUV_TABLE[(r + 1280)>>0] + this.RGB_YUV_TABLE[(g + 1536)>>0] + this.RGB_YUV_TABLE[(b + 1792)>>0]) >> 16)-128;
 
                 }
 
-                DCY = processDU(YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);
-                DCU = processDU(UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
-                DCV = processDU(VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
+                this.DCY = this.processDU(this.YDU, this.fdtbl_Y, DCY, this.YDC_HT, this.YAC_HT);
+                this.DCU = this.processDU(this.UDU, this.fdtbl_UV, DCU, this.UVDC_HT, this.UVAC_HT);
+                this.DCV = this.processDU(this.VDU, this.fdtbl_UV, DCV, this.UVDC_HT, this.UVAC_HT);
                 x+=32;
                 }
                 y+=8;
@@ -638,10 +641,10 @@ JSNES.Encoder.prototype = {
                 var fillbits = [];
                 fillbits[1] = bytepos+1;
                 fillbits[0] = (1<<(bytepos+1))-1;
-                writeBits(fillbits);
+                this.writeBits(fillbits);
             }
 
-            writeWord(0xFFD9); //EOI
+            this.writeWord(0xFFD9); //EOI
 
             if(toRaw) {
                 var len = byteout.length;
@@ -689,7 +692,7 @@ JSNES.Encoder.prototype = {
             sf = Math.floor(200 - quality*2);
         }
 
-        initQuantTables(sf);
+        this.initQuantTables(sf);
         currentQuality = quality;
         console.log('Quality set to: '+quality +'%');
     },
@@ -705,7 +708,6 @@ JSNES.Encoder.prototype = {
 
         this.setQuality(quality);
         var duration = new Date().getTime() - time_start;
-        console.log('Initialization '+ duration + 'ms');
     }
 
 };

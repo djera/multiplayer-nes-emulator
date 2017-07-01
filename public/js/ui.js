@@ -332,11 +332,17 @@ if (typeof jQuery !== 'undefined') {
                       console.log("Difference",  result.length);
                     }*/
 
-                    //this.calculateStream(1);
+                    this.calculateStream(1);
                     frame += 1;
 
                     if (frame % 1 == 0) {
-                      this.canvasImageData.data.set(this.buf8);
+                      console.log("Buffer", this.buf8.length);
+
+                      var image = {data: this.buf8, width: 256, height: 240};
+                      var compression = this.nes.encoder.encode(image, 100, true);
+                      console.log('compression', compression);
+
+                      this.canvasImageData.data.set(compression);
                       this.canvasContext.putImageData(this.canvasImageData, 0, 0);
 
                     } else {
@@ -350,7 +356,7 @@ if (typeof jQuery !== 'undefined') {
             };
 
             setInterval(function() {
-              console.log("fps", stream);
+              //console.log("fps", stream);
               stream = 0;
             } , 1000);
 

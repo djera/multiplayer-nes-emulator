@@ -50,7 +50,7 @@ var JSNES = function(opts) {
     this.keyboard = new JSNES.Keyboard();
     this.encoder = new JSNES.Encoder();
     this.encoder.init();
-    
+
     this.ui.updateStatus("Ready to load a ROM.");
 };
 
