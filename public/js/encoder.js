@@ -612,7 +612,6 @@ JSNES.Encoder.prototype = {
                     r = imageData[ p++ ];
                     g = imageData[ p++ ];
                     b = imageData[ p++ ];
-
                     /* // calculate YUV values dynamically
                     YDU[pos]=((( 0.29900)*r+( 0.58700)*g+( 0.11400)*b))-128; //-0x80
                     UDU[pos]=(((-0.16874)*r+(-0.33126)*g+( 0.50000)*b));
